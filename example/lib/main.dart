@@ -9,7 +9,8 @@ import 'package:flutter/animation.dart';
 import 'package:flutter/rendering.dart';
 
 import 'package:mic_stream/mic_stream.dart';
-import 'package:path_provider/path_provider.dart';
+
+import 'client.dart';
 
 enum Command {
   start,
@@ -28,6 +29,7 @@ class MicStreamExampleApp extends StatefulWidget {
 
 class _MicStreamExampleAppState extends State<MicStreamExampleApp>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  Client client;
   Stream stream;
   StreamSubscription listener;
   List<int> currentSamples = [];
@@ -68,6 +70,7 @@ class _MicStreamExampleAppState extends State<MicStreamExampleApp>
         _changeListening();
         break;
       case Command.start:
+        client = Client();
         _startListening();
         break;
       case Command.stop:
@@ -98,7 +101,7 @@ class _MicStreamExampleAppState extends State<MicStreamExampleApp>
     // after invoking the method for the first time, though, these will be available;
     // It is not necessary to setup a listener first, the stream only needs to be returned first
     print("Start Listening to the microphone, sample rate is ${await MicStream.sampleRate}, bit depth is ${await MicStream.bitDepth}, bufferSize: ${await MicStream.bufferSize}");
-		bytesPerSample = (await MicStream.bitDepth / 8).toInt();
+		bytesPerSample = await MicStream.bitDepth ~/ 8;
     samplesPerSecond = (await MicStream.sampleRate).toInt();
     localMax = null;
     localMin = null;
@@ -108,7 +111,8 @@ class _MicStreamExampleAppState extends State<MicStreamExampleApp>
       startTime = DateTime.now();
     });
     visibleSamples = [];
-    listener = stream.listen(_calculateSamples);
+    // listener = stream.listen(_calculateSamples);
+    Client().transcriptAudio(stream).listen(print);
     return true;
   }
 
@@ -121,7 +125,7 @@ class _MicStreamExampleAppState extends State<MicStreamExampleApp>
 
   void _calculateWaveSamples(samples) {
     bool first = true;
-    visibleSamples = List();
+    visibleSamples = [];
     int tmp = 0;
     for (int sample in samples) {
       if (sample > 128) sample -= 255;
@@ -221,15 +225,15 @@ class _MicStreamExampleAppState extends State<MicStreamExampleApp>
             items: [
               BottomNavigationBarItem(
                 icon: Icon(Icons.broken_image),
-                title: Text("Sound Wave"),
+                label: "Sound Wave",
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.broken_image),
-                title: Text("Intensity Wave"),
+                label: "Intensity Wave",
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.view_list),
-                title: Text("Statistics"),
+                label: "Statistics",
               )
             ],
             backgroundColor: Colors.black26,

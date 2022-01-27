@@ -1,0 +1,20 @@
+// Proto file specifying Server-Client-interaction
+
+// Proto version
+syntax = "proto3";
+
+// Interface to server
+service AudioProcessor {
+    rpc transcriptAudio (stream Samples) returns (stream Response);
+}
+
+// Used to send audio chunks to the server
+message Samples {
+    bytes chunk = 1;
+}
+
+// Used to return text to the user
+message Response {
+    // One sentence (or sequence of words) recognized
+    string word = 1;
+}
