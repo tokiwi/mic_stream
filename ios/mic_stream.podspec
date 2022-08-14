@@ -17,5 +17,7 @@ Provides a tool to get the microphone input as Byte Stream
   s.dependency 'Flutter'
 
   s.ios.deployment_target = '8.0'
+
+  s.swift_versions = ['5.0']
 end
 
