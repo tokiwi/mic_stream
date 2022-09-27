@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:permission_handler/permission_handler.dart' as handler;
 import 'package:flutter/services.dart';
@@ -143,6 +145,42 @@ class MicStream {
     });
 
     return _microphone;
+  }
+
+  static Future<Stream<int>?> asIntStream({
+    AudioSource audioSource: _DEFAULT_AUDIO_SOURCE,
+    int sampleRate: _DEFAULT_SAMPLE_RATE,
+    ChannelConfig channelConfig: _DEFAULT_CHANNELS_CONFIG,
+    AudioFormat audioFormat: _DEFAULT_AUDIO_FORMAT
+  }) async {
+    var rawStream = microphone(
+        audioSource: audioSource,
+        sampleRate: sampleRate,
+        channelConfig: channelConfig,
+        audioFormat: audioFormat
+    );
+    switch (audioFormat) {
+      case AudioFormat.ENCODING_PCM_8BIT:
+        return rawStream.then((stream) => stream?.expand(_cast));
+      case AudioFormat.ENCODING_PCM_16BIT:
+        return rawStream.then ((stream) => stream?.expand(_squash));
+    }
+  }
+
+  static Iterable<int> _cast (Uint8List list) sync* {
+    for (var byte in list) {
+      yield byte;
+    }
+  }
+
+  static Iterable<int> _squash (Uint8List list) sync* {
+    num swap;
+    bool isFirst = true;
+    for (var byte in list) {
+      if (isFirst) swap = byte;
+      if (!isFirst) yield byte * pow(2, 8) + byte as int;
+      isFirst = !isFirst;
+    }
   }
 
   /// Updates flag to determine whether to request audio recording permission. Set to false to disable dialogue, set to true (default) to request permission if necessary

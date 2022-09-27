@@ -94,11 +94,20 @@ class _MicStreamExampleAppState extends State<MicStreamExampleApp>
     // Default option. Set to false to disable request permission dialogue
     MicStream.shouldRequestPermission(true);
 
+    // stream = await MicStream.microphone(
+    //     audioSource: AudioSource.DEFAULT,
+    //     sampleRate: 1000 * (rng.nextInt(50) + 30),
+    //     channelConfig: ChannelConfig.CHANNEL_IN_MONO,
+    //     audioFormat: AUDIO_FORMAT);
+
     stream = await MicStream.microphone(
         audioSource: AudioSource.DEFAULT,
         sampleRate: 1000 * (rng.nextInt(50) + 30),
         channelConfig: ChannelConfig.CHANNEL_IN_MONO,
-        audioFormat: AUDIO_FORMAT);
+        audioFormat: AudioFormat.ENCODING_PCM_16BIT);
+
+    listener = stream!.listen(print);
+
     // after invoking the method for the first time, though, these will be available;
     // It is not necessary to setup a listener first, the stream only needs to be returned first
     print("Start Listening to the microphone, sample rate is ${await MicStream.sampleRate}, bit depth is ${await MicStream.bitDepth}, bufferSize: ${await MicStream.bufferSize}");
@@ -112,7 +121,7 @@ class _MicStreamExampleAppState extends State<MicStreamExampleApp>
       startTime = DateTime.now();
     });
     visibleSamples = [];
-    listener = stream!.listen(_calculateSamples);
+    // listener = stream!.listen(_calculateSamples);
     return true;
   }
 
@@ -124,27 +133,27 @@ class _MicStreamExampleAppState extends State<MicStreamExampleApp>
   }
 
   void _calculateWaveSamples(samples) {
-    bool first = true;
-    visibleSamples = [];
-    int tmp = 0;
-    for (int sample in samples) {
-      if (sample > 128) sample -= 255;
-      if (first) {
-        tmp = sample * 128;
-      } else {
-        tmp += sample;
-        visibleSamples.add(tmp);
-
-        localMax ??= visibleSamples.last;
-        localMin ??= visibleSamples.last;
-        localMax = max(localMax!, visibleSamples.last);
-        localMin = min(localMin!, visibleSamples.last);
-
-        tmp = 0;
-      }
-      first = !first;
-    }
-    print(visibleSamples);
+    // bool first = true;
+    // visibleSamples = [];
+    // int tmp = 0;
+    // for (int sample in samples) {
+    //   if (sample > 128) sample -= 255;
+    //   if (first) {
+    //     tmp = sample * 128;
+    //   } else {
+    //     tmp += sample;
+    //     visibleSamples.add(tmp);
+    //
+    //     localMax ??= visibleSamples.last;
+    //     localMin ??= visibleSamples.last;
+    //     localMax = max(localMax!, visibleSamples.last);
+    //     localMin = min(localMin!, visibleSamples.last);
+    //
+    //     tmp = 0;
+    //   }
+    //   first = !first;
+    // }
+    // print(visibleSamples);
   }
 
   void _calculateIntensitySamples(samples) {
