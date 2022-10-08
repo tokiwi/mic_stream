@@ -48,10 +48,10 @@ click Runner -> Signing & Capabilities -> Check "Audio Input"
 
 ```
 // Init a new Stream
-Stream<List<int>> stream = await MicStream.microphone(sampleRate: 44100);
+Stream<Uint8list> stream = await MicStream.microphone(sampleRate: 44100);
 
 // Start listening to the stream
-StreamSubscription<List<int>> listener = stream.listen((samples) => print(samples));
+StreamSubscription<Uint8list> listener = stream.listen(print);
 ```
 
 ```
