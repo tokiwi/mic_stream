@@ -5,7 +5,6 @@ import 'dart:math';
 
 import 'package:permission_handler/permission_handler.dart' as handler;
 import 'package:flutter/services.dart';
-import 'dart:typed_data';
 
 // In reference to the implementation of the official sensors plugin
 // https://github.com/flutter/plugins/tree/master/packages/sensors
