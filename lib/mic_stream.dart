@@ -142,11 +142,11 @@ class MicStream {
       return Stream.error(
           RangeError.range(sampleRate, _MIN_SAMPLE_RATE, _MAX_SAMPLE_RATE));
 
-    final permissionStatus = _requestPermission
+    final permissionStream = (_requestPermission
         ? Stream.fromFuture(MicStream.permissionStatus)
-        : Stream.value(true);
+        : Stream.value(true)).asBroadcastStream();
 
-    return permissionStatus.asyncExpand((grantedPermission) {
+    return permissionStream.asyncExpand((grantedPermission) {
       if (!grantedPermission) {
         throw Exception('Microphone permission is not granted');
       }
