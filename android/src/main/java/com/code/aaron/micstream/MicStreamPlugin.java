@@ -1,7 +1,5 @@
 package com.code.aaron.micstream;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -116,24 +114,18 @@ public class MicStreamPlugin implements FlutterPlugin, EventChannel.StreamHandle
             // Wait until recorder is initialised
             while (recorder == null || recorder.getRecordingState() != AudioRecord.RECORDSTATE_RECORDING);
 
-            // Allocate a new buffer to write data to
-            ByteBuffer data = ByteBuffer.allocateDirect(BUFFER_SIZE);
-
-            // Set ByteOrder to native
-            ByteOrder nativeOrder = ByteOrder.nativeOrder();
-            data.order(nativeOrder);
-            System.out.println("mic_stream: Using native byte order " + nativeOrder);
-
             // Repeatedly push audio samples to stream
             while (record) {
-                // Read audio data into buffer
-                recorder.read(data, BUFFER_SIZE, AudioRecord.READ_BLOCKING);
+
+                // Read audio data into new byte array
+                byte[] data = new byte[BUFFER_SIZE];
+                recorder.read(data, 0, BUFFER_SIZE);
 
                 // push data into stream
                 try {
-                    eventSink.success(data.array());
+                    eventSink.success(data);
                 } catch (IllegalArgumentException e) {
-                    System.out.println("mic_stream: " + data + " is not valid!");
+                    System.out.println("mic_stream: " + Arrays.hashCode(data) + " is not valid!");
                     eventSink.error("-1", "Invalid Data", e);
                 }
             }
